@@ -1,6 +1,8 @@
 package tmall.servlet;
 
 import tmall.bean.Category;
+import tmall.util.ImageUtil;
+import tmall.util.Page;
 
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
@@ -59,8 +61,8 @@ public class CategoryServlet extends BaseBackServlet{
     @Override
     public String edit(HttpServletRequest request, HttpServletResponse response, Page page) {
         int id = Integer.parseInt(request.getParameter("id"));
-        Category c = categoryDAO.get(id);
-        request.setAttribute("c", c);
+        Category category = categoryDAO.get(id);
+        request.setAttribute("category", category);
         return "admin/editCategory.jsp";
     }
 
