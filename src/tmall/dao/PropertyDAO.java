@@ -117,7 +117,7 @@ public class PropertyDAO {
         return list(cid, 0, Short.MAX_VALUE);
     }
 
-    private List<Property> list(int cid, int start, int count) {
+    public List<Property> list(int cid, int start, int count) {
         List<Property> propertyList = new ArrayList<>();
         String sql = "select * from property where cid=? order by id desc limit ?,?";
         try (Connection conn = DBUtil.getConnection();

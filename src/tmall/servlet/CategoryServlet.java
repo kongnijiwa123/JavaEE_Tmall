@@ -62,7 +62,7 @@ public class CategoryServlet extends BaseBackServlet{
     public String edit(HttpServletRequest request, HttpServletResponse response, Page page) {
         int id = Integer.parseInt(request.getParameter("id"));
         Category category = categoryDAO.get(id);
-        request.setAttribute("category", category);
+        request.setAttribute("c", category);
         return "admin/editCategory.jsp";
     }
 

@@ -92,7 +92,7 @@ public class CategoryDAO {
 
     public List<Category> list(int start, int count) {
         List<Category> categoryList = new ArrayList<>();
-        String sql="select * form Category order by id desc ?,? ";
+        String sql="select * from Category order by id desc limit ?,? ";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

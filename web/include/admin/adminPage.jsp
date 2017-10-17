@@ -7,14 +7,15 @@
     <ul class="pagination">
         <li <c:if test="${!page.hasPreviouse}">class="disabled"</c:if>>
             <%--aria-lable为无障碍标签--%>
-            <a href="?page.start=0${page.parm}" aria-label="Previous">
+            <a href="?page.start=0${page.param}" aria-label="Previous">
                 <span aria-hidden="true">«</span>
             </a>
         </li>
 
         <li <c:if test="${!page.hasPreviouse}">class="disabled"</c:if>>
-            <a href="?page.start=${page.start-page.count}${page.param}" aria-label="Previous"></a>
+            <a href="?page.start=${page.start-page.count}${page.param}" aria-label="Previous">
             <span aria-hidden="true">‹</span>
+            </a>
         </li>
 
         <c:forEach begin="0" end="${page.totalPage-1}" varStatus="status">

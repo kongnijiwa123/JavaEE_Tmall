@@ -10,6 +10,7 @@ public class Page {
         super();
         this.start = start;
         this.count = count;
+        //param = new String("");
     }
 
     public int getStart() {
@@ -79,7 +80,7 @@ public class Page {
             last=total-count;
         }else
             last=total-total%count;
-
+        last=last>0?last:0;
         return last;
     }
 }

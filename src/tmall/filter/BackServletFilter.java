@@ -31,7 +31,7 @@ public class BackServletFilter implements Filter {
 
             request.setAttribute("method", method);
 
-            request.getRequestDispatcher("/" + servletPath);
+            request.getRequestDispatcher("/" + servletPath).forward(request,response);
             return;
         }
         filterChain.doFilter(request,response);
