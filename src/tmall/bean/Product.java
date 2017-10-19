@@ -12,6 +12,7 @@ public class Product {
     private Date createDate;
     private Category category;
     private int id;
+
     private ProductImage firstProductImage;
     private List<ProductImage> productImages;
     private List<ProductImage> productSingleImages;

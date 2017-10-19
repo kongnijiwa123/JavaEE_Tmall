@@ -127,7 +127,7 @@ public class ProductDAO {
         return list(cid, 0, Short.MAX_VALUE);
     }
 
-    private List<Product> list(int cid, int start, int count) {
+    public List<Product> list(int cid, int start, int count) {
         List<Product> productList = new ArrayList<>();
         Category category = new CategoryDAO().get(cid);
         String sql = "select * from product where cid=? order by id desc limit ?,?";

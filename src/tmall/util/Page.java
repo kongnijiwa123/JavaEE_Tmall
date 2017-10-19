@@ -78,8 +78,9 @@ public class Page {
         int last;
         if (0 == total % count) {
             last=total-count;
-        }else
-            last=total-total%count;
+        }else {
+            last = total - total % count;
+        }
         last=last>0?last:0;
         return last;
     }

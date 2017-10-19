@@ -53,7 +53,7 @@
                     </td>
                     <td>
                         <a href="admin_product_list?cid=${c.id}">
-                            <span class="glyphicon glyphicon-edit"></span>
+                            <span class="glyphicon glyphicon-shopping-cart"></span>
                         </a>
                     </td>
                         <%--<td>
