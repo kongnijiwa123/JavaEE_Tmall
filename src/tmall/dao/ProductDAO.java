@@ -56,7 +56,7 @@ public class ProductDAO {
     }
 
     public void update(Product product) {
-        String sql = "update product set name=?,subTile=?,orignalPrice=?,promotePrice=?,stock=?,cid=?,createDate=? where id=?";
+        String sql = "update product set name=?,subTitle=?,orignalPrice=?,promotePrice=?,stock=?,cid=?,createDate=? where id=?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

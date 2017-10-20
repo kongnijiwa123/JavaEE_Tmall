@@ -62,7 +62,7 @@ public class ProductServlet extends BaseBackServlet {
         Product product = productDAO.get(id);
         request.setAttribute("p", product);
 
-        List<Property> pts = propertyDAO.list(product.getCategory().getId());
+        //List<Property> pts = propertyDAO.list(product.getCategory().getId());
         propertyValueDAO.init(product);
 
         List<PropertyValue> pvs = propertyValueDAO.list(product.getId());
@@ -85,7 +85,7 @@ public class ProductServlet extends BaseBackServlet {
 
     @Override
     public String update(HttpServletRequest request, HttpServletResponse response, Page page) {
-        int cid = Integer.parseInt("cid");
+        int cid = Integer.parseInt(request.getParameter("cid"));
         Category category = categoryDAO.get(cid);
 
         int id = Integer.parseInt(request.getParameter("id"));
