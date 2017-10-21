@@ -16,14 +16,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CategoryServlet extends BaseBackServlet{
+public class CategoryServlet extends BaseBackServlet {
     @Override
     public String add(HttpServletRequest request, HttpServletResponse response, Page page) {
         Map<String, String> params = new HashMap<>();
         InputStream is = super.parseUpload(request, params);
 
         String name = params.get("name");
-        Category c=new Category();
+        Category c = new Category();
         c.setName(name);
         categoryDAO.add(c);
 
@@ -32,17 +32,30 @@ public class CategoryServlet extends BaseBackServlet{
 
         try {
             if (null != is && 0 != is.available()) {
-                try (FileOutputStream fos = new FileOutputStream(file)) {
-                    byte[] b = new byte[1024 * 1024];
-                    int length = 0;
-                    while (-1 != (length = is.read(b))) {
-                        fos.write(b, 0, length);
-                    }
-                    fos.flush();
-                    //把文件保存为jpg格式
-                    BufferedImage img = ImageUtil.changeToJpg(file);
-                    ImageIO.write(img, "jpg", file);
+                FileOutputStream fos = new FileOutputStream(file);
+                byte[] b = new byte[1024 * 1024];
+                int length = 0;
+                while (-1 != (length = is.read(b))) {
+                    fos.write(b, 0, length);
                 }
+                fos.flush();
+
+
+                //把文件保存为jpg格式
+
+                BufferedImage img = ImageUtil.changeToJpg(file);
+                ImageIO.write(img, "jpg", file);
+
+               /*
+               1.ImageIO.write(inFile,formatName,outFile)方法
+               只有当formatName=jpg时，转换速度快，其他格式都慢。
+               2.不使用JDK的BufferedImage im=ImageIO.read(file)方法是因为
+               有人说此方法会导致显示不正常，图片发红等问题，不过目前没有遇到
+               BufferedImage im = ImageIO.read(file);
+                ImageIO.write(im, "jpg", new File(imageFolder,"aaaaa"));
+                */
+
+                fos.close();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -107,8 +120,8 @@ public class CategoryServlet extends BaseBackServlet{
 
     @Override
     public String list(HttpServletRequest request, HttpServletResponse response, Page page) {
-        List<Category> cs=categoryDAO.list(page.getStart(),page.getCount());
-        int total=categoryDAO.getTotal();
+        List<Category> cs = categoryDAO.list(page.getStart(), page.getCount());
+        int total = categoryDAO.getTotal();
         page.setTotal(total);
 
         request.setAttribute("thecs", cs);
