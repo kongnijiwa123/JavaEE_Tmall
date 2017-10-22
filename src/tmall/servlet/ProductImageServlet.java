@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProductImageServlet extends BaseBackServlet {
@@ -43,7 +44,7 @@ public class ProductImageServlet extends BaseBackServlet {
 
         productImageDAO.add(pi);
 
-        //生成文件
+        //生成文件(文件名根据数据库生成的图片id+.jpg)
         String fileName = pi.getId() + ".jpg";
         String imageFolder = null;
         String imageFolder_small = null;
@@ -71,11 +72,13 @@ public class ProductImageServlet extends BaseBackServlet {
                 }
 
                 fos.flush();
+                fos.close();
                 //把文件保存为jpg格式
                 BufferedImage img = ImageUtil.changeToJpg(file);
                 ImageIO.write(img, "jpg", file);
 
                 if (ProductImageDAO.type_single.equals(type)) {
+                    //另存缩略图
                     File file_small = new File(imageFolder_small, fileName);
                     File file_middle = new File(imageFolder_middle, fileName);
 
@@ -92,7 +95,28 @@ public class ProductImageServlet extends BaseBackServlet {
 
     @Override
     public String delete(HttpServletRequest request, HttpServletResponse response, Page page) {
-        return null;
+        int id = Integer.parseInt(request.getParameter("id"));
+        ProductImage pi = productImageDAO.get(id);
+        productImageDAO.delete(id);
+
+        //如果是单图片类型（single类型）则找出另存的缩略图，一并删除
+        if (ProductImageDAO.type_single.equals(pi.getTyep())) {
+            String imageFolder_single = request.getSession().getServletContext().getRealPath("img/productSingle");
+            String imageFolder_small = request.getSession().getServletContext().getRealPath("img/productSingle_small");
+            String imageFolder_middle = request.getSession().getServletContext().getRealPath("img/productSingle_middle");
+
+            File file_single = new File(imageFolder_single, id + ".jpg");
+            file_single.delete();
+            File file_small = new File(imageFolder_small, id + ".jpg");
+            file_small.delete();
+            File file_middle = new File(imageFolder_middle, id + ".jpg");
+            file_middle.delete();
+        } else {//如果是详情图片detail 不存在缩略图只删除本身就可以了
+            String imageFolder_detail = request.getSession().getServletContext().getRealPath("img/productDetail");
+            File file_detail = new File(imageFolder_detail, id + ".jpg");
+            file_detail.delete();
+        }
+        return "@admin_productImage_list?pid="+pi.getProduct().getId();
     }
 
     @Override
@@ -107,6 +131,15 @@ public class ProductImageServlet extends BaseBackServlet {
 
     @Override
     public String list(HttpServletRequest request, HttpServletResponse response, Page page) {
-        return null;
+        int pid = Integer.parseInt(request.getParameter("pid"));
+        Product product = productDAO.get(pid);
+        List<ProductImage> pisSingle = productImageDAO.list(product, ProductImageDAO.type_single);
+        List<ProductImage> pisDetail = productImageDAO.list(product, ProductImageDAO.type_detail);
+
+        request.setAttribute("p", product);
+        request.setAttribute("pisSingle", pisSingle);
+        request.setAttribute("pisDetail", pisDetail);
+
+        return "admin/listProductImage.jsp";
     }
 }

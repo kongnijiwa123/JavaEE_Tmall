@@ -39,7 +39,7 @@ public class CategoryServlet extends BaseBackServlet {
                     fos.write(b, 0, length);
                 }
                 fos.flush();
-
+                fos.close();
 
                 //把文件保存为jpg格式
 
@@ -55,7 +55,7 @@ public class CategoryServlet extends BaseBackServlet {
                 ImageIO.write(im, "jpg", new File(imageFolder,"aaaaa"));
                 */
 
-                fos.close();
+
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,6 +68,11 @@ public class CategoryServlet extends BaseBackServlet {
     public String delete(HttpServletRequest request, HttpServletResponse response, Page page) {
         int id = Integer.parseInt(request.getParameter("id"));
         categoryDAO.delete(id);
+        //删除对应的图片
+        String imageFolder = request.getSession().getServletContext().getRealPath("img/category");
+        File imageFile = new File(imageFolder, id + ".jpg");
+        imageFile.delete();
+
         return "@admin_category_list";
     }
 
