@@ -118,7 +118,33 @@ public class ProductImageDAO {
 
                 productImage.setId(rs.getInt("id"));
                 productImage.setTyep(rs.getString("type"));
-                productImage.setProduct(new ProductDAO().get(rs.getInt("pid")));
+                productImage.setProduct(product);
+
+                productImageList.add(productImage);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return productImageList;
+    }
+
+    public List<ProductImage> list(int pid) {
+        List<ProductImage> productImageList = new ArrayList<>();
+
+        String sql = "select * from productImage where pid=? ";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, pid);
+
+
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                ProductImage productImage=new ProductImage();
+
+                productImage.setId(rs.getInt("id"));
+                productImage.setTyep(rs.getString("type"));
+                productImage.setProduct(new ProductDAO().get(pid));
 
                 productImageList.add(productImage);
             }

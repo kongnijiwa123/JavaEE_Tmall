@@ -134,4 +134,8 @@ public class CategoryServlet extends BaseBackServlet {
 
         return "admin/listCategory.jsp";
     }
+
+    public String test(HttpServletRequest request, HttpServletResponse response, Page page) {
+        return "%hahaha嗷嗷";
+    }
 }

@@ -82,6 +82,9 @@ public class ProductImageServlet extends BaseBackServlet {
                     File file_small = new File(imageFolder_small, fileName);
                     File file_middle = new File(imageFolder_middle, fileName);
 
+                    file_small.getParentFile().mkdirs();
+                    file_middle.getParentFile().mkdirs();
+
                     ImageUtil.resizeImage(file, 56, 56, file_small);
                     ImageUtil.resizeImage(file, 217, 190, file_middle);
                 }

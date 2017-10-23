@@ -41,6 +41,8 @@
         <servlet-name>CategoryServlet</servlet-name>
         <url-pattern>/categoryServlet</url-pattern>
     </servlet-mapping>
+
+
     <filter>
         <filter-name>EncodingFilter</filter-name>
         <filter-class>tmall.filter.EncodingFilter</filter-class>

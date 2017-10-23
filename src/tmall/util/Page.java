@@ -48,8 +48,9 @@ public class Page {
     public boolean isHasPreviouse() {
         if (start == 0) {
             return false;
-        } else
+        } else {
             return true;
+        }
     }
 
     public boolean isHasNext() {

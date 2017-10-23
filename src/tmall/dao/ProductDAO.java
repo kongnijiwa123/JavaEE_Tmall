@@ -10,9 +10,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class ProductDAO {
     public int getTotal(int cid) {
@@ -303,4 +301,58 @@ public class ProductDAO {
         return productList;
     }
 
+
+   /* //因为删除操作会影响其他表，所以删除之前找出关联的其他表，
+    // product表有productImage，propertyValue，orderItem,review的外键
+    public Map<String,List<Integer>> mapForeignKeyIds(Product product) {
+
+        Map<String, List<Integer>> resultMap = new HashMap<>();
+        List<Integer> piIds = new ArrayList<>();
+        List<Integer> ptvIds = new ArrayList<>();
+        List<Integer> oiIds = new ArrayList<>();
+        List<Integer> rvIds = new ArrayList<>();
+
+        resultMap.put("piIds", piIds);
+        resultMap.put("ptvIds", ptvIds);
+        resultMap.put("oiIds", oiIds);
+        resultMap.put("rvIds", rvIds);
+
+        String sql_pi=" select id from productImage where pid="+product.getId();
+        String sql_ptv=" select id from propertyValue where pid="+product.getId();
+        String sql_oi=" select id from propertyValue where pid="+product.getId();
+        String sql_rv=" select id from propertyValue where pid="+product.getId();
+
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps_pi = conn.prepareStatement(sql_pi)) {
+
+            ResultSet rs = ps_pi.executeQuery();
+            while (rs.next()) {
+                Integer piId = rs.getInt("id");
+                piIds.add(piId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps_ptv = conn.prepareStatement(sql_ptv)) {
+
+            ResultSet rs=ps_ptv.executeQuery();
+            while (rs.next()) {
+                Integer ptvId = rs.getInt("id");
+                ptvIds.add(ptvId);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return resultMap;
+    }
+
+    public static void main(String[] args) {
+        ProductDAO productDAO=new ProductDAO();
+        System.out.println(productDAO.mapForeignKeyIds(productDAO.get(12)));
+    }
+*/
 }

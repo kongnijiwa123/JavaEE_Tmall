@@ -17,23 +17,27 @@ public class BackServletFilter implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response=(HttpServletResponse)servletResponse;
 
-        String contextPath=request.getServletContext().getContextPath();
         String uri=request.getRequestURI();
+       /* //如果发现是css，js或图片文件，直接放行
+        if(!(uri.contains(".css")||uri.contains(".js")||uri.contains(".jpg")|| uri.contains(".png"))) {*/
+            String contextPath = request.getServletContext().getContextPath();
 
-        uri = uri.replace(contextPath, "");
+            uri = uri.replace(contextPath, "");
 
-        if (uri.startsWith("/admin_")) {
-            String[] paths=uri.split("_");
+            //除了admin目录其他都排除
+            if (uri.startsWith("/admin_")) {
+                String[] paths = uri.split("_");
 
-            //这里需要uri设置合理，否则会数组越界
-            String servletPath=paths[1]+"Servlet";
-            String method = paths[2];
+                //这里需要uri设置合理，否则会数组越界
+                String servletPath = paths[1] + "Servlet";
+                String method = paths[2];
 
-            request.setAttribute("method", method);
+                request.setAttribute("method", method);
 
-            request.getRequestDispatcher("/" + servletPath).forward(request,response);
-            return;
-        }
+                request.getRequestDispatcher("/" + servletPath).forward(request, response);
+                return;
+            }
+       // }
         filterChain.doFilter(request,response);
     }
 

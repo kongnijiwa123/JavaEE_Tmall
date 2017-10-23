@@ -152,6 +152,10 @@ public class PropertyValueDAO {
         return propertyValueList;
     }
 
+
+/*使用的长度为0字符串进行初始化的，目的是使其在数据库中存在一条对应的记录，方便后续的修改。
+
+因为在后台属性值的管理页面，只有修改，没有“新增”这个功能，所以需要事先初始化。*/
     public void init(Product product) {
         List<Property> propertyList=new PropertyDAO().list(product.getCategory().getId());
 
@@ -170,7 +174,7 @@ public class PropertyValueDAO {
 
     public List<PropertyValue> list(int pid) {
         List<PropertyValue> propertyValueList = new ArrayList<>();
-        String sql = "select * from propertyValue where pid=" + pid + "order by ptid desc";
+        String sql = "select * from propertyValue where pid=" + pid + " order by ptid desc";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
