@@ -5,41 +5,103 @@
 
 <nav>
     <ul class="pagination">
-        <li <c:if test="${!page.hasPreviouse}">class="disabled"</c:if>>
-            <%--aria-lable为无障碍标签--%>
-            <a href="?page.start=0${page.param}" aria-label="Previous">
-                <span aria-hidden="true">«</span>
-            </a>
-        </li>
 
-        <li <c:if test="${!page.hasPreviouse}">class="disabled"</c:if>>
-            <a href="?page.start=${page.start-page.count}${page.param}" aria-label="Previous">
-            <span aria-hidden="true">‹</span>
-            </a>
-        </li>
+            <c:choose>
+                <c:when test="${page.hasPreviouse}">
+                    <li>
+                        <%--aria-lable为无障碍标签--%>
+                        <a href="?page.start=0${page.param}" aria-label="Previous">
+                            <span aria-hidden="true">«</span>
+                        </a>
+                    </li>
 
-        <c:forEach begin="0" end="${page.totalPage-1}" varStatus="status">
-            <%--分页只显示前后3页的下标--%>
-            <c:if test="${status.count*page.count-page.start<=20&&status.count*page.count-page.start>=-10}">
-                <li <c:if test="${status.index*page.count==page.start}">class="disabled" </c:if>>
-                    <a href="?page.start=${status.index*page.count}${page.param}"
-                       <c:if test="${status.index*page.count==page.start}">class="current"</c:if>>
-                        ${status.count}
-                    </a>
-                </li>
+                </c:when>
+                <c:otherwise>
+                    <li class="disabled">
+                        <span aria-hidden="true">«</span>
+                    </li>
+                </c:otherwise>
+            </c:choose>
+
+
+            <c:choose>
+                <c:when test="${page.hasPreviouse}">
+                    <li>
+                            <%--aria-lable为无障碍标签--%>
+                        <a href="?page.start=${page.start-page.count}${page.param}" aria-label="Previous">
+                            <span aria-hidden="true">‹</span>
+                        </a>
+                    </li>
+
+                </c:when>
+                <c:otherwise>
+                    <li class="disabled">
+                        <span aria-hidden="true">‹</span>
+                    </li>
+                </c:otherwise>
+            </c:choose>
+
+
+        <%--只显示前后3个分页，将end设置为6，并设置3-index--%>
+        <c:forEach begin="0" end="6" varStatus="status">
+            <%--如果下标的start大于等于0 并且小于等于总页数--%>
+            <c:if test="${0<=page.start-page.count*(3-status.index)&&page.start-page.count*(3-status.index)<=(page.totalPage-1)*page.count}">
+                <%--如果是当前页，下标不能点击--%>
+                <c:choose>
+                    <c:when test="${page.start==(page.start-page.count*(3-status.index))}">
+                        <li class="disabled current">
+                            <span>
+                                <fmt:formatNumber type="number" value="${((page.start-page.count*(3-status.index))/page.count)+1}"></fmt:formatNumber>
+                            </span>
+                        </li>
+
+                    </c:when>
+                    <c:otherwise>
+                        <li>
+                            <a href="?page.start=${page.start-page.count*(3-status.index)}${page.param}" aria-label="Next">
+                                <span>
+                                <fmt:formatNumber type="number" value="${((page.start-page.count*(3-status.index))/page.count)+1}"></fmt:formatNumber>
+                                </span>
+                            </a>
+                        </li>
+                    </c:otherwise>
+                </c:choose>
             </c:if>
         </c:forEach>
 
-        <li <c:if test="${!page.hasNext}">class="disabled"</c:if>>
-            <a href="?page.start=${page.start+page.count}${page.param}" aria-label="Next">
-                <span aria-hidden="true">›</span>
-            </a>
-        </li>
-        <li <c:if test="${!page.hasNext}">class="disabled"</c:if>>
-            <a href="?page.start=${page.last}${page.param}" aria-label="Next">
-                <span aria-hidden="true">»</span>
-            </a>
-        </li>
+
+        <c:choose>
+            <c:when test="${page.hasNext}">
+                <li>
+                    <a href="?page.start=${page.start+page.count}${page.param}" aria-label="Next">
+                        <span aria-hidden="true">›</span>
+                    </a>
+                </li>
+
+            </c:when>
+            <c:otherwise>
+                <li class="disabled">
+                    <span aria-hidden="true">›</span>
+                </li>
+            </c:otherwise>
+        </c:choose>
+
+        <c:choose>
+            <c:when test="${page.hasNext}">
+                <li>
+                    <a href="?page.start=${page.last}${page.param}" aria-label="Next">
+                        <span aria-hidden="true">»</span>
+                    </a>
+                </li>
+
+            </c:when>
+            <c:otherwise>
+                <li class="disabled">
+                        <span aria-hidden="true">»</span>
+                </li>
+            </c:otherwise>
+        </c:choose>
+
     </ul>
 </nav>
 </body>

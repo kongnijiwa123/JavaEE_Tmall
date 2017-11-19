@@ -77,7 +77,7 @@ public class ProductImageDAO {
 
     public ProductImage get(int id) {
         ProductImage productImage=null;
-        String sql = "select from productImage where id=" + id;
+        String sql = "select * from productImage where id=" + id;
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -39,12 +39,12 @@ div.listDataTableDiv{
 div.footer{
 	margin:20px;
 }
-div.editPVDiv{
+div.editPTVDiv{
 	width:800px;
 	margin:0 auto;
 	
 }
-span.pvName{
+span.ptvName{
 	display:inline-block;
 	width:100px;	
 	color:#555555;
@@ -53,17 +53,18 @@ span.pvName{
 	margin-left:20px;
 	
 }
-div.eachPV{
+div.eachPTV{
 	float:left;
 	margin:5px;
 }
-span.pvValue{
+span.ptvValue{
 	display:inline-block;
 	width:200px;
-	border:1px solid lightgray;	
+	border:2px solid lightgray;
 	padding:0px;
 }
-span.pvValue input{
+span.ptvValue input{
+	width:196px;
 	border-width:0px;
 }
 div.addPictureDiv{

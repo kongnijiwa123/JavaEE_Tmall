@@ -158,7 +158,7 @@ public class PropertyValueDAO {
 因为在后台属性值的管理页面，只有修改，没有“新增”这个功能，所以需要事先初始化。*/
     public void init(Product product) {
         List<Property> propertyList=new PropertyDAO().list(product.getCategory().getId());
-
+//此方法连接数较多，应当重写!
         for (Property pt : propertyList) {
             PropertyValue propertyValue=get(product.getId(),pt.getId());
             if (null == propertyValue) {

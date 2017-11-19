@@ -140,20 +140,20 @@ public class ProductServlet extends BaseBackServlet {
         //List<Property> pts = propertyDAO.list(product.getCategory().getId());
         propertyValueDAO.init(product);
 
-        List<PropertyValue> pvs = propertyValueDAO.list(product.getId());
+        List<PropertyValue> ptvs = propertyValueDAO.list(product.getId());
 
-        request.setAttribute("pvs", pvs);
+        request.setAttribute("ptvs", ptvs);
 
         return "admin/editProductValue.jsp";
     }
 
-    public String updatePropertyValue(HttpServletRequest request, HttpServletResponse response) {
-        int pvid = Integer.parseInt(request.getParameter("pvid"));
+    public String updatePropertyValue(HttpServletRequest request, HttpServletResponse response,Page page) {
+        int ptvid = Integer.parseInt(request.getParameter("ptvid"));
         String value = request.getParameter("value");
 
-        PropertyValue pv = propertyValueDAO.get(pvid);
-        pv.setValue(value);
-        propertyValueDAO.update(pv);
+        PropertyValue ptv = propertyValueDAO.get(ptvid);
+        ptv.setValue(value);
+        propertyValueDAO.update(ptv);
         return "%success";
     }
 
