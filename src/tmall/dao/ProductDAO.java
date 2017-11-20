@@ -222,8 +222,12 @@ public class ProductDAO {
         category.setProducts(productList);
     }
 
+    /**
+     * 填充每行每列的产品
+     * @param categoryList 类别
+     */
     public void fillByRow(List<Category> categoryList) {
-        int productNumberEachRow=0;
+        int productNumberEachRow=8;
         for (Category category : categoryList) {
             List<Product> productList = category.getProducts();
             List<List<Product>> productsByRow = new ArrayList<>();

@@ -41,28 +41,29 @@ public abstract class BaseBackServlet extends HttpServlet {
 
     @Override
     public void service(HttpServletRequest request, HttpServletResponse response) {
-        try {
+
             /*获取分页信息*/
-            int start = 0;
-            int count = 5;
-            if(null!=request.getParameter("page.start")) {
-                try {
-                    start = Integer.parseInt(request.getParameter("page.start"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        int start = 0;
+        int count = 5;
+        if (null != request.getParameter("page.start")) {
+            try {
+                start = Integer.parseInt(request.getParameter("page.start"));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            if(null!=request.getParameter("page.count")) {
-                try {
-                    count = Integer.parseInt(request.getParameter("page.count"));
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+        }
+        if (null != request.getParameter("page.count")) {
+            try {
+                count = Integer.parseInt(request.getParameter("page.count"));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            Page page = new Page(start, count);
+        }
+        Page page = new Page(start, count);
 
 //            借助反射，调用对应的方法
-            String method = (String) request.getAttribute("method");
+        String method = (String) request.getAttribute("method");
+        try {
             Method m = this.getClass().getMethod(method, javax.servlet.http.HttpServletRequest.class
                     , javax.servlet.http.HttpServletResponse.class, Page.class);
             String redirect = m.invoke(this, request, response, page).toString();
@@ -83,24 +84,24 @@ public abstract class BaseBackServlet extends HttpServlet {
     }
 
     public InputStream parseUpload(HttpServletRequest request, Map<String, String> params) {
-        InputStream is=null;
-        try{
+        InputStream is = null;
+        try {
             DiskFileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);
             //设置上传文件的大小限制为10M
             factory.setSizeThreshold(1024 * 1024 * 10);
 
             List items = upload.parseRequest(request);
-            Iterator iter=items.iterator();
+            Iterator iter = items.iterator();
             while (iter.hasNext()) {
                 FileItem item = (FileItem) iter.next();
                 if (!item.isFormField()) {
                     //item.getInputStream()获取上传文件的输入流
-                    is=item.getInputStream();
-                }else {
+                    is = item.getInputStream();
+                } else {
                     String paramName = item.getFieldName();
-                    String paramValue=item.getString();
-                    paramValue = new String(paramValue.getBytes("ISO-8859-1"),"UTF-8");
+                    String paramValue = item.getString();
+                    paramValue = new String(paramValue.getBytes("ISO-8859-1"), "UTF-8");
                     params.put(paramName, paramValue);
                 }
             }

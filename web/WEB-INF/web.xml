@@ -4,6 +4,17 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+
+    <servlet>
+        <servlet-name>ForeServlet</servlet-name>
+    <servlet-class>tmall.servlet.ForeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ForeServlet</servlet-name>
+        <url-pattern>/foreServlet</url-pattern>
+    </servlet-mapping>
+
+
     <servlet>
         <servlet-name>OrderServlet</servlet-name>
         <servlet-class>tmall.servlet.OrderServlet</servlet-class>
@@ -86,6 +97,15 @@
 
     <filter-mapping>
         <filter-name>BackServletFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>ForeServletFilter</filter-name>
+        <filter-class>tmall.filter.ForeServletFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ForeServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 </web-app>

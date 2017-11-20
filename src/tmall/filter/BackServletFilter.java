@@ -22,7 +22,7 @@ public class BackServletFilter implements Filter {
         if(!(uri.contains(".css")||uri.contains(".js")||uri.contains(".jpg")|| uri.contains(".png"))) {*/
             String contextPath = request.getServletContext().getContextPath();
 
-            uri = uri.replace(contextPath, "");
+            uri = uri.replaceFirst(contextPath, "");
 
             //除了admin目录其他都排除
             if (uri.startsWith("/admin_")) {
