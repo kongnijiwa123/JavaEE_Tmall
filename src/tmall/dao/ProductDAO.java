@@ -183,7 +183,7 @@ public class ProductDAO {
 
             while (rs.next()) {
                 Product product = new Product();
-                int id = rs.getInt(1);
+                int id = rs.getInt("id");
                 int cid = rs.getInt("cid");
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
@@ -212,13 +212,89 @@ public class ProductDAO {
     }
 
     public void fill(List<Category> categoryList) {
-        for (Category category : categoryList) {
+        fill(categoryList, 0, Short.MAX_VALUE);
+        /*for (Category category : categoryList) {
             fill(category);
+        }*/
+    }
+
+    /**
+     * 填充部分产品
+     * @param categoryList
+     * @param start
+     * @param count
+     */
+    public void fill(List<Category> categoryList,int start,int count) {
+        //String sql = "select distinct Product.* from Category,Product WHERE Product.cid=? limit ?,? ";
+        String sql = "select p.*,max(productimage.id) from productimage" +
+                ",(select distinct Product.* from Category,Product WHERE Product.cid=? limit ?,?)AS p" +
+                " GROUP BY p.id,productimage.type,productimage.pid " +
+                "HAVING productimage.type='type_single' and productimage.pid=p.id;";
+
+        /*List<ProductImage> productImageList = new ProductImageDAO().list(product, ProductImageDAO.type_single,0,1);
+        if (null != productImageList) {
+            product.setFirstProductImage(productImageList.get(0));
+        }*/
+        try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
+            ps.setInt(2, start);
+            ps.setInt(3, count);
+            for (Category category : categoryList) {
+                ps.setInt(1,category.getId());
+
+                ResultSet rs = ps.executeQuery();
+
+                List<Product> productList = new ArrayList<>();
+                while (rs.next()) {
+                    Product product = new Product();
+                    int id = rs.getInt("id");
+                    //int cid = rs.getInt("cid");
+                    String name = rs.getString("name");
+                    String subTitle = rs.getString("subTitle");
+                    float orignalPrice = rs.getFloat("orignalPrice");
+                    float promotePrice = rs.getFloat("promotePrice");
+                    int stock = rs.getInt("stock");
+                    Date createDate = DateUtil.timestampToDate( rs.getTimestamp("createDate"));
+                    int productImageId=rs.getInt("max(productimage.id)");
+
+                    product.setName(name);
+                    product.setSubTitle(subTitle);
+                    product.setOrignalPrice(orignalPrice);
+                    product.setPromotePrice(promotePrice);
+                    product.setStock(stock);
+                    product.setCreateDate(createDate);
+                    product.setId(id);
+                    product.setCategory(category);
+                    //setFirstProductImage(product);
+
+                    ProductImage productImage=new ProductImage();
+                    productImage.setId(productImageId);
+                    productImage.setTyep(ProductImageDAO.type_single);
+                    productImage.setProduct(product);
+                    product.setFirstProductImage(productImage);
+                    productList.add(product);
+                }
+                category.setProducts(productList);
+            }
+        } catch (SQLException e) {
+
+            e.printStackTrace();
         }
     }
 
     private void fill(Category category) {
-        List<Product> productList = this.list(category.getId());
+       /* List<Product> productList = this.list(category.getId());
+        category.setProducts(productList);*/
+       fill(category,0,Short.MAX_VALUE);
+    }
+
+    /**
+     *将所有产品填充的代价太大，设定合适的范围填充
+     * @param category
+     * @param start
+     * @param count
+     */
+    private void fill(Category category,int start,int count) {
+        List<Product> productList = this.list(category.getId(),start,count);
         category.setProducts(productList);
     }
 
@@ -242,8 +318,8 @@ public class ProductDAO {
     }
 
     public void setFirstProductImage(Product product) {
-        List<ProductImage> productImageList = new ProductImageDAO().list(product, ProductImageDAO.type_single);
-        if (!productImageList.isEmpty()) {
+        List<ProductImage> productImageList = new ProductImageDAO().list(product, ProductImageDAO.type_single,0,1);
+        if (null != productImageList) {
             product.setFirstProductImage(productImageList.get(0));
         }
     }

@@ -38,11 +38,13 @@ public class ForeServletFilter implements Filter {
                 }
             }
             request.setAttribute("cartTotalItemNumber", cartTotalItemNumber);
-            /*List<Category> cs = (List<Category>) request.getAttribute("cs");
+
+            //cs将用于每个页面搜索框下的推荐，4个就够了
+            List<Category> cs = (List<Category>) request.getAttribute("cs");
             if (null == cs) {
-                cs = new CategoryDAO().list();
+                cs = new CategoryDAO().list(0,4);
                 request.setAttribute("cs", cs);
-            }*/
+            }
 
             String method = uri.replaceFirst("/fore","");
             request.setAttribute("method", method);

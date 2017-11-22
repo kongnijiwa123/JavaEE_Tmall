@@ -100,7 +100,7 @@ public class ProductImageDAO {
         return list(product, type, 0, Short.MAX_VALUE);
     }
 
-    private List<ProductImage> list(Product product, String type, int start, int count) {
+    public List<ProductImage> list(Product product, String type, int start, int count) {
         List<ProductImage> productImageList = new ArrayList<>();
 
         String sql = "select * from productImage where pid=? and type=? order by id desc limit ?,?";
