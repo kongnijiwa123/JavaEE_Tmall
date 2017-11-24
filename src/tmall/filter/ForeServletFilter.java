@@ -25,9 +25,8 @@ public class ForeServletFilter implements Filter {
 
         String contextPath = request.getServletContext().getContextPath();
         String uri = request.getRequestURI().replaceFirst(contextPath, "");
-        if (uri.startsWith("/fore") && !uri.startsWith("/foreServlet")) {
-            //request.getServletContext().setAttribute("contextPath",contextPath);
 
+        if (!uri.startsWith("/admin_")) {
 
             User user = (User) request.getSession().getAttribute("user");
             int cartTotalItemNumber = 0;
@@ -42,13 +41,16 @@ public class ForeServletFilter implements Filter {
             //cs将用于每个页面搜索框下的推荐，4个就够了
             List<Category> cs = (List<Category>) request.getAttribute("cs");
             if (null == cs) {
-                cs = new CategoryDAO().list(0,4);
+                cs = new CategoryDAO().list(0, 4);
                 request.setAttribute("cs", cs);
             }
+        }
+        if (uri.startsWith("/fore") && !uri.startsWith("/foreServlet")) {
 
-            String method = uri.replaceFirst("/fore","");
+            //request.getServletContext().setAttribute("contextPath",contextPath);
+            String method = uri.replaceFirst("/fore", "");
             request.setAttribute("method", method);
-            request.getRequestDispatcher("/foreServlet").forward(request,response);
+            request.getRequestDispatcher("/foreServlet").forward(request, response);
             return;
         }
 

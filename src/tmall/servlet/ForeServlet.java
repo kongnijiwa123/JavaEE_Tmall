@@ -1,6 +1,8 @@
 package tmall.servlet;
 
+import org.springframework.web.util.HtmlUtils;
 import tmall.bean.Category;
+import tmall.bean.User;
 import tmall.util.Page;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,5 +19,25 @@ public class ForeServlet extends BaseForeServlet {
         productDAO.fillByRow(cs);
         request.setAttribute("cs", cs);
         return "home.jsp";
+    }
+
+    public String register(HttpServletRequest request, HttpServletResponse response, Page page) {
+        String name = request.getParameter("name");
+        String password = request.getParameter("password");
+        //对用户名进行转义，防止恶意注册
+        name = HtmlUtils.htmlEscape(name);
+        boolean exist = userDAO.isExist(name);
+
+        if (exist) {
+            request.setAttribute("msg","用户名已经被使用，请更换");
+            return "foreregister.jsp";
+        }
+
+        User user = new User();
+        user.setName(name);
+        user.setPassword(password);
+        userDAO.add(user);
+
+        return "@registerSuccess.jsp";
     }
 }
