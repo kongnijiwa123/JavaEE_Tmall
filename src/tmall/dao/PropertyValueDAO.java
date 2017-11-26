@@ -180,13 +180,16 @@ public class PropertyValueDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ResultSet rs=ps.executeQuery();
+
+            ProductDAO productDAO=new ProductDAO();
+            PropertyDAO propertyDAO=new PropertyDAO();
             while (rs.next()) {
                 PropertyValue propertyValue=new PropertyValue();
 
                 propertyValue.setId(rs.getInt("id"));
                 propertyValue.setValue(rs.getString("value"));
-                propertyValue.setProduct(new ProductDAO().get(pid));
-                propertyValue.setProperty(new PropertyDAO().get(rs.getInt("ptid")));
+                propertyValue.setProduct(productDAO.get(pid));
+                propertyValue.setProperty(propertyDAO.get(rs.getInt("ptid")));
 
                 propertyValueList.add(propertyValue);
             }

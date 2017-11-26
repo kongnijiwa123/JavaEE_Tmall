@@ -8,7 +8,7 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8"
          pageEncoding="UTF-8" isELIgnored="false"%>
 
-<title>模仿天猫官网</title>
+<title>myTmall官网</title>
 
 <div class="homepageDiv">
     <%@include file="categoryAndcarousel.jsp"%>

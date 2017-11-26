@@ -226,10 +226,14 @@ public class ProductDAO {
      */
     public void fill(List<Category> categoryList,int start,int count) {
         //String sql = "select distinct Product.* from Category,Product WHERE Product.cid=? limit ?,? ";
-        String sql = "select p.*,max(productimage.id) from productimage" +
+        /*String sql = "select p.*,max(productimage.id) from productimage" +
                 ",(select distinct Product.* from Category,Product WHERE Product.cid=? limit ?,?)AS p" +
                 " GROUP BY p.id,productimage.type,productimage.pid " +
-                "HAVING productimage.type='type_single' and productimage.pid=p.id;";
+                "HAVING productimage.type='type_single' and productimage.pid=p.id;";*/
+        String sql="select product.*,max(productimage.id) from productimage,product where product.cid=? " +
+                "GROUP BY product.id,productimage.pid,productimage.type " +
+                "HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?";
+
 
         /*List<ProductImage> productImageList = new ProductImageDAO().list(product, ProductImageDAO.type_single,0,1);
         if (null != productImageList) {
@@ -281,7 +285,7 @@ public class ProductDAO {
         }
     }
 
-    private void fill(Category category) {
+    public void fill(Category category) {
        /* List<Product> productList = this.list(category.getId());
         category.setProducts(productList);*/
        fill(category,0,Short.MAX_VALUE);
@@ -294,8 +298,53 @@ public class ProductDAO {
      * @param count
      */
     private void fill(Category category,int start,int count) {
-        List<Product> productList = this.list(category.getId(),start,count);
-        category.setProducts(productList);
+        String sql="select product.*,max(productimage.id) from productimage,product where product.cid=? " +
+                "GROUP BY product.id,productimage.pid,productimage.type " +
+                "HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, category.getId());
+            ps.setInt(2, start);
+            ps.setInt(3,count);
+
+            ResultSet rs = ps.executeQuery();
+
+            List<Product> productList = new ArrayList<>();
+            while (rs.next()) {
+                Product product = new Product();
+                int id = rs.getInt("id");
+                //int cid = rs.getInt("cid");
+                String name = rs.getString("name");
+                String subTitle = rs.getString("subTitle");
+                float orignalPrice = rs.getFloat("orignalPrice");
+                float promotePrice = rs.getFloat("promotePrice");
+                int stock = rs.getInt("stock");
+                Date createDate = DateUtil.timestampToDate( rs.getTimestamp("createDate"));
+                int productImageId=rs.getInt("max(productimage.id)");
+
+                product.setName(name);
+                product.setSubTitle(subTitle);
+                product.setOrignalPrice(orignalPrice);
+                product.setPromotePrice(promotePrice);
+                product.setStock(stock);
+                product.setCreateDate(createDate);
+                product.setId(id);
+                product.setCategory(category);
+                //setFirstProductImage(product);
+
+                ProductImage productImage=new ProductImage();
+                productImage.setId(productImageId);
+                productImage.setTyep(ProductImageDAO.type_single);
+                productImage.setProduct(product);
+                product.setFirstProductImage(productImage);
+                productList.add(product);
+            }
+            category.setProducts(productList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**

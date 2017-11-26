@@ -26,4 +26,5 @@ public class DBUtil {
         Connection conn = DriverManager.getConnection(url, loginName, password);
         return conn;
     }
+
 }

@@ -271,7 +271,7 @@ public class OrderItemDAO {
 
     public int getSaleCount(int pid) {
         int total=0;
-        String sql = "select sum(number) from orderItem where pid=?" + pid;
+        String sql = "select sum(number) from orderItem where pid=" + pid;
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

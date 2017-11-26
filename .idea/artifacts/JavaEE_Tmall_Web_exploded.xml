@@ -8,7 +8,7 @@
           <element id="module-output" name="JavaEE_Tmall" />
         </element>
         <element id="directory" name="lib">
-          <element id="library" level="project" name="lib" />
+          <element id="library" level="project" name="jars" />
         </element>
       </element>
     </root>
