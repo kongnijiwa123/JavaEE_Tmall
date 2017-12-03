@@ -1,5 +1,6 @@
 package tmall.dao;
 
+import tmall.bean.Category;
 import tmall.bean.Product;
 import tmall.bean.Property;
 import tmall.bean.PropertyValue;
@@ -174,22 +175,50 @@ public class PropertyValueDAO {
 
     public List<PropertyValue> list(int pid) {
         List<PropertyValue> propertyValueList = new ArrayList<>();
-        String sql = "select * from propertyValue where pid=" + pid + " order by ptid desc";
+        //String sql = "select * from propertyValue where pid=" + pid + " order by ptid desc";
+        String sql = "select *,ptv.id as ptvid,p.id as pid,p.name as pname,c.id as cid,c.name as cname,pt.id as ptid,pt.name as ptname " +
+                "from propertyValue as ptv,property as pt,product as p,category as c " +
+                "where ptv.pid=? and ptv.ptid=pt.id and p.id=ptv.pid and c.id=p.cid " +
+                "order by ptv.ptid desc;";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
+            ps.setInt(1,pid);
             ResultSet rs=ps.executeQuery();
 
-            ProductDAO productDAO=new ProductDAO();
-            PropertyDAO propertyDAO=new PropertyDAO();
+            //ProductDAO productDAO=new ProductDAO();
+            //PropertyDAO propertyDAO=new PropertyDAO();
             while (rs.next()) {
                 PropertyValue propertyValue=new PropertyValue();
+                Product product = new Product();
+                Category category = new Category();
+                Property property = new Property();
 
-                propertyValue.setId(rs.getInt("id"));
+                propertyValue.setId(rs.getInt("ptvid"));
                 propertyValue.setValue(rs.getString("value"));
-                propertyValue.setProduct(productDAO.get(pid));
-                propertyValue.setProperty(propertyDAO.get(rs.getInt("ptid")));
+
+                category.setId(rs.getInt("cid"));
+                category.setName(rs.getString("cName"));
+
+                //属性里的product不需要用到全部的product的属性,所以没有将product属性填充满
+                product.setId(rs.getInt("pid"));
+                product.setName(rs.getString("pname"));
+                product.setSubTitle(rs.getString("subtitle"));
+                product.setOrignalPrice(rs.getFloat("orignalPrice"));
+                product.setPromotePrice(rs.getFloat("promotePrice"));
+                product.setCategory(category);
+
+
+                property.setId(rs.getInt("ptId"));
+                property.setName(rs.getString("ptName"));
+                property.setCategory(category);
+
+                propertyValue.setId(rs.getInt("ptvId"));
+                propertyValue.setValue(rs.getString("value"));
+                propertyValue.setProperty(property);
+                propertyValue.setProduct(product);
+
 
                 propertyValueList.add(propertyValue);
             }

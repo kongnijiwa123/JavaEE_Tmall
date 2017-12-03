@@ -119,10 +119,20 @@ public class ForeServlet extends BaseForeServlet {
                 case "all":
                     Collections.sort(c.getProducts(), ProductComparator.all);
                     break;
+                default:
+                    break;
             }
         }
 
         request.setAttribute("c", c);
         return "category.jsp";
+    }
+
+    public String search(HttpServletRequest request, HttpServletResponse response, Page page) {
+        String keyword = request.getParameter("keyword");
+        List<Product> ps = productDAO.search(keyword, 0, 100);
+        productDAO.setSaleAndReviewNumber(ps);
+        request.setAttribute("ps", ps);
+        return "searchResult.jsp";
     }
 }
