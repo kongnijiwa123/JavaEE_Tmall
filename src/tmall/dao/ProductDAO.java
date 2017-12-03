@@ -389,7 +389,10 @@ public class ProductDAO {
 
     public List<Product> search(String keyword, int start, int count) {
         List<Product> productList = new ArrayList<>();
-        String sql = "select * from product where name like ? limit ?,?";
+        String sql = "select category.name as cname,product.id as pid,product.*,max(productimage.id) " +
+                "from productimage,product,category " +
+                "where product.name like ? and product.cid=category.id " +
+                "GROUP BY product.id,productimage.pid,productimage.type HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?;";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -401,7 +404,7 @@ public class ProductDAO {
             ResultSet rs=ps.executeQuery();
             while (rs.next()) {
                 Product product=new Product();
-                int id = rs.getInt(1);
+                int id = rs.getInt("pid");
                 int cid = rs.getInt("cid");
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
@@ -418,9 +421,18 @@ public class ProductDAO {
                 product.setCreateDate(createDate);
                 product.setId(id);
 
-                Category category = new CategoryDAO().get(cid);
+                Category category = new Category();
+                category.setId(cid);
+                category.setName(rs.getString("cName"));
+
+                ProductImage productImage=new ProductImage();
+                productImage.setId(rs.getInt("max(productimage.id)"));
+                productImage.setTyep(ProductImageDAO.type_single);
+                productImage.setProduct(product);
+
                 product.setCategory(category);
                 setFirstProductImage(product);
+
                 productList.add(product);
             }
         } catch (SQLException e) {
