@@ -51,7 +51,7 @@ public class OrderItemDAO {
             ps.execute();
             ResultSet rs=ps.getGeneratedKeys();
             if (rs.next()) {
-                orderItem.setId(rs.getInt("id"));
+                orderItem.setId(rs.getInt(1));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -63,10 +63,11 @@ public class OrderItemDAO {
         try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
 
             ps.setInt(1, orderItem.getProduct().getId());
-            if(null==orderItem.getOrder())
+            if(null==orderItem.getOrder()) {
                 ps.setInt(2, -1);
-            else
+            } else {
                 ps.setInt(2, orderItem.getOrder().getId());
+            }
             ps.setInt(3, orderItem.getUser().getId());
             ps.setInt(4, orderItem.getNumber());
 

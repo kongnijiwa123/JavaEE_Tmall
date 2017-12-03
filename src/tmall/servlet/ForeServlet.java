@@ -4,12 +4,14 @@ import org.springframework.web.util.HtmlUtils;
 import tmall.bean.*;
 import tmall.dao.CategoryDAO;
 import tmall.dao.ProductImageDAO;
+import tmall.dao.UserDAO;
 import tmall.util.Page;
 import tmall.util.ProductComparator;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.sql.DriverManager;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -58,6 +60,19 @@ public class ForeServlet extends BaseForeServlet {
         }
         request.getSession().setAttribute("user", user);
         return "@forehome";
+    }
+
+    public String loginAjax(HttpServletRequest request, HttpServletResponse response, Page page) {
+        String name = request.getParameter("name");
+        String password = request.getParameter("password");
+        User user = userDAO.get(name, password);
+
+        if (null == user) {
+            return "%fail";
+        } else {
+            request.getSession().setAttribute("user", user);
+            return "%success";
+        }
     }
 
     public String logout(HttpServletRequest request, HttpServletResponse response, Page page) {
@@ -129,10 +144,68 @@ public class ForeServlet extends BaseForeServlet {
     }
 
     public String search(HttpServletRequest request, HttpServletResponse response, Page page) {
-        String keyword = request.getParameter("keyword");
-        List<Product> ps = productDAO.search(keyword, 0, 100);
+        String keyword = request.getParameter("keyword").trim();
+        List<Product> ps=null;
+        //如果关键字为空，直接查询前100条product,不使用模糊查询以加快速度
+        if (0 == keyword.length()) {
+            ps = productDAO.list(0, 100);
+        } else {
+            ps = productDAO.search(keyword, 0, 100);
+        }
         productDAO.setSaleAndReviewNumber(ps);
         request.setAttribute("ps", ps);
         return "searchResult.jsp";
+    }
+
+    public String buyone(HttpServletRequest request, HttpServletResponse response, Page page) {
+        int pid = Integer.parseInt(request.getParameter("pid"));
+        int num = Integer.parseInt(request.getParameter("num"));
+
+        Product p = productDAO.get(pid);
+        int oiId = 0;
+
+        User user = (User) request.getSession().getAttribute("user");
+
+        //从购物车OrderItem中查找是否有此商品，如果有就进行数量追加
+        boolean found = false;
+        List<OrderItem> ois = orderItemDAO.listByUser(user.getId());
+        for (OrderItem orderItem : ois) {
+            if (orderItem.getProduct().getId() == pid) {
+                orderItem.setNumber(orderItem.getNumber() + num);
+                orderItemDAO.update(orderItem);
+                found = true;
+                oiId = orderItem.getId();
+                break;
+            }
+        }
+        //如果不存在对应的OrderItem,那么就新增一个订单项OrderItem
+        if (!found) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setUser(user);
+            orderItem.setNumber(num);
+            orderItem.setProduct(p);
+
+            orderItemDAO.add(orderItem);
+            oiId = orderItem.getId();
+        }
+
+        return "@forebuy?oiId=" + oiId;
+    }
+
+    public String buy(HttpServletRequest request, HttpServletResponse response, Page page) {
+        String[] oiIds = request.getParameterValues("oiId");
+        List<OrderItem> ois = new ArrayList<>();
+        float total = 0;
+        for (String strId : oiIds) {
+            int oiId = Integer.parseInt(strId);
+            OrderItem oi = orderItemDAO.get(oiId);
+            //计算价格
+            total += oi.getProduct().getPromotePrice() * oi.getNumber();
+            ois.add(oi);
+        }
+
+        request.setAttribute("ois", ois);
+        request.setAttribute("total", total);
+        return "buy.jsp";
     }
 }
