@@ -26,15 +26,12 @@ public class ForeServletFilter implements Filter {
         String contextPath = request.getServletContext().getContextPath();
         String uri = request.getRequestURI().replaceFirst(contextPath, "");
 
-        if (!uri.startsWith("/admin_")) {
+        if (uri.startsWith("/fore") && !uri.startsWith("/foreServlet")) {
 
             User user = (User) request.getSession().getAttribute("user");
             int cartTotalItemNumber = 0;
             if (null != user) {
-                List<OrderItem> ois = new OrderItemDAO().listByUser(user.getId());
-                for (OrderItem orderItem : ois) {
-                    cartTotalItemNumber += orderItem.getNumber();
-                }
+                cartTotalItemNumber = new OrderItemDAO().getTotalByUser(user.getId());
             }
             request.setAttribute("cartTotalItemNumber", cartTotalItemNumber);
 
@@ -44,8 +41,6 @@ public class ForeServletFilter implements Filter {
                 cs = new CategoryDAO().list(0, 4);
                 request.setAttribute("cs", cs);
             }
-        }
-        if (uri.startsWith("/fore") && !uri.startsWith("/foreServlet")) {
 
             //request.getServletContext().setAttribute("contextPath",contextPath);
             String method = uri.replaceFirst("/fore", "");

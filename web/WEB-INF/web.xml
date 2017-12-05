@@ -4,10 +4,20 @@
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
          version="3.1">
 
+    <resource-ref>
+        <res-ref-name>jdbc/dbpool</res-ref-name>
+        <res-type>javax.sql.DataSource</res-type>
+        <res-auth>Container</res-auth>
+    </resource-ref>
+
+    <session-config>
+        <session-timeout>1800</session-timeout>
+    </session-config>
+
 
     <servlet>
         <servlet-name>ForeServlet</servlet-name>
-    <servlet-class>tmall.servlet.ForeServlet</servlet-class>
+        <servlet-class>tmall.servlet.ForeServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ForeServlet</servlet-name>
@@ -81,14 +91,16 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <filter-name>NoCacheFilter</filter-name>
-        <filter-class>tmall.filter.NoCacheFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>NoCacheFilter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    <!-- 开发时用来设置浏览器不使用缓存
+     <filter>
+          <filter-name>NoCacheFilter</filter-name>
+          <filter-class>tmall.filter.NoCacheFilter</filter-class>
+      </filter>
+      <filter-mapping>
+          <filter-name>NoCacheFilter</filter-name>
+          <url-pattern>/*</url-pattern>
+      </filter-mapping>
+      -->
 
     <filter>
         <filter-name>BackServletFilter</filter-name>
@@ -98,6 +110,30 @@
     <filter-mapping>
         <filter-name>BackServletFilter</filter-name>
         <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>ForeAuthFilter</filter-name>
+        <filter-class>tmall.filter.ForeAuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ForeAuthFilter</filter-name>
+        <url-pattern>/forelogout</url-pattern>
+        <url-pattern>/forebuyone</url-pattern>
+        <url-pattern>/forebuy</url-pattern>
+        <url-pattern>/foreaddCart</url-pattern>
+        <url-pattern>/forecart</url-pattern>
+        <url-pattern>/forechangeOrderItem</url-pattern>
+        <url-pattern>/foredeleteOrderItem</url-pattern>
+        <url-pattern>/forecreateOrder</url-pattern>
+        <url-pattern>/forealipay</url-pattern>
+        <url-pattern>/forepayed</url-pattern>
+        <url-pattern>/forebought</url-pattern>
+        <url-pattern>/foreconfirmPay</url-pattern>
+        <url-pattern>/foreorderConfirmed</url-pattern>
+        <url-pattern>/foredeleteOrder</url-pattern>
+        <url-pattern>/forereview</url-pattern>
+        <url-pattern>/foredoReview</url-pattern>
     </filter-mapping>
 
     <filter>

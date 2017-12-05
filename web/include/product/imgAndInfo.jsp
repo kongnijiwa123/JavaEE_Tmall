@@ -57,7 +57,9 @@
                                     $(".addCartButton").css("background-color","lightgray")
                                     $(".addCartButton").css("border-color","lightgray")
                                     $(".addCartButton").css("color","black")
-
+                                    //修改购物车数量
+                                    var count=${cartTotalItemNumber}+Number(num);
+                                    $("#cartCount").html(count);
                                 }
                                 else{
 

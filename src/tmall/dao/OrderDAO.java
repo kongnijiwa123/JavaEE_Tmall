@@ -39,6 +39,27 @@ public class OrderDAO {
         return total;
     }
 
+    public int getPriceTotal(int oid) {
+        int total=0;
+        String sql = "select promotePrice,number from order_,orderitem,product where order_.id=? and orderitem.oid=order_.id and product.id=orderitem.pid;";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1,oid);
+
+            ResultSet rs=ps.executeQuery();
+            while (rs.next()) {
+                total += rs.getFloat("promotePrice") * rs.getInt("number");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return total;
+    }
+
+
     public void add(Order order) {
         String sql="insert into order_ values(null,?,?,?,?,?,?,?,?,?,?,?,?)";
 

@@ -15,13 +15,40 @@ import java.util.List;
 
 public class OrderItemDAO {
     public int getTotal() {
-        int total=0;
+        int total = 0;
         String sql = "select count(*) from orderItem";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ResultSet rs=ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    /**
+     * 查询某个用户的购物车数量
+     *
+     * @param uid 用户id
+     * @return
+     */
+    public int getTotalByUser(int uid) {
+        int total = 0;
+        //查询某个用户的购物车数量
+        String sql = "select sum(number) from orderItem where uid=? and oid=-1";
+
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, uid);
+
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 total = rs.getInt(1);
             }
@@ -41,7 +68,7 @@ public class OrderItemDAO {
             //订单项在创建的时候，是没有订单信息的
             if (null == orderItem.getOrder()) {
                 ps.setInt(2, -1);
-            }else {
+            } else {
                 ps.setInt(2, orderItem.getOrder().getId());
             }
 
@@ -49,7 +76,7 @@ public class OrderItemDAO {
             ps.setInt(4, orderItem.getNumber());
 
             ps.execute();
-            ResultSet rs=ps.getGeneratedKeys();
+            ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) {
                 orderItem.setId(rs.getInt(1));
             }
@@ -63,7 +90,7 @@ public class OrderItemDAO {
         try (Connection c = DBUtil.getConnection(); PreparedStatement ps = c.prepareStatement(sql);) {
 
             ps.setInt(1, orderItem.getProduct().getId());
-            if(null==orderItem.getOrder()) {
+            if (null == orderItem.getOrder()) {
                 ps.setInt(2, -1);
             } else {
                 ps.setInt(2, orderItem.getOrder().getId());
@@ -82,7 +109,7 @@ public class OrderItemDAO {
     }
 
     public void delete(int id) {
-        String sql="delete from orderItem where id="+id;
+        String sql = "delete from orderItem where id=" + id;
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -93,15 +120,15 @@ public class OrderItemDAO {
     }
 
     public OrderItem get(int id) {
-        OrderItem orderItem=null;
+        OrderItem orderItem = null;
         String sql = "select * from orderItem where id=" + id;
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ResultSet rs=ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
-                orderItem=new OrderItem();
+                orderItem = new OrderItem();
 
                 int pid = rs.getInt("pid");
                 int oid = rs.getInt("oid");
@@ -113,8 +140,8 @@ public class OrderItemDAO {
                 orderItem.setUser(user);
                 orderItem.setNumber(number);
 
-                if(-1!=oid){
-                    Order order= new OrderDAO().get(oid);
+                if (-1 != oid) {
+                    Order order = new OrderDAO().get(oid);
                     orderItem.setOrder(order);
                 }
 
@@ -144,10 +171,10 @@ public class OrderItemDAO {
             ps.setInt(2, start);
             ps.setInt(3, count);
 
-            ResultSet rs=ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                OrderItem orderItem=new OrderItem();
+                OrderItem orderItem = new OrderItem();
 
                 orderItem.setId(rs.getInt("id"));
                 orderItem.setNumber(rs.getInt("number"));
@@ -188,7 +215,7 @@ public class OrderItemDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                OrderItem orderItem=new OrderItem();
+                OrderItem orderItem = new OrderItem();
 
                 orderItem.setId(rs.getInt("id"));
                 orderItem.setNumber(rs.getInt("number"));
@@ -209,13 +236,41 @@ public class OrderItemDAO {
     }
 
     public void fill(List<Order> orderList) {
+        /*String sql = "select promotePrice,number from order_,orderitem,product where order_.id=? and orderitem.oid=order_.id and product.id=orderitem.pid;";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            for (Order order : orderList) {
+
+                ps.setInt(1, order.getId());
+
+                ResultSet rs = ps.executeQuery();
+
+                int totalPrice = 0;
+                int totalNumber=0;
+                while (rs.next()) {
+                    totalPrice += rs.getFloat("promotePrice") * rs.getInt("number");
+                    totalNumber += rs.getInt("number");
+                }
+
+                order.setTotal(totalPrice);
+                order.setTotalNumber(totalNumber);
+
+                order.setOrderItems(listByOrder(order.getId()));
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }*/
+
         for (Order order : orderList) {
             List<OrderItem> orderItemList = listByOrder(order.getId());
-            float total=0;
-            int totalNumber=0;
+            float total = 0;
+            int totalNumber = 0;
             for (OrderItem orderItem : orderItemList) {
                 total += orderItem.getNumber() * orderItem.getProduct().getPromotePrice();
-                totalNumber+=orderItem.getNumber();
+                totalNumber += orderItem.getNumber();
             }
             order.setTotal(total);
             order.setTotalNumber(totalNumber);
@@ -226,7 +281,7 @@ public class OrderItemDAO {
     public void fill(Order order) {
         List<OrderItem> orderItemList = listByOrder(order.getId());
 
-        float total=0;
+        float total = 0;
         for (OrderItem orderItem : orderItemList) {
             total += orderItem.getNumber() * orderItem.getProduct().getPromotePrice();
         }
@@ -271,13 +326,13 @@ public class OrderItemDAO {
     }
 
     public int getSaleCount(int pid) {
-        int total=0;
+        int total = 0;
         String sql = "select sum(number) from orderItem where pid=" + pid;
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            ResultSet rs=ps.executeQuery();
+            ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 total = rs.getInt(1);
             }

@@ -109,6 +109,7 @@
                         </c:if>
 
                     </tr>
+                    <input type="hidden" name="oiid" value="${oi.id}">
                 </c:forEach>
 
                 </tbody>
