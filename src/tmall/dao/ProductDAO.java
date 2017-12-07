@@ -127,8 +127,11 @@ public class ProductDAO {
 
     public List<Product> list(int cid, int start, int count) {
         List<Product> productList = new ArrayList<>();
-        Category category = new CategoryDAO().get(cid);
-        String sql = "select * from product where cid=? order by id desc limit ?,?";
+        //Category category = new CategoryDAO().get(cid);
+        String sql = "select  category.name as cname,product.id as pid,product.*,pi.* " +
+                "from (category join product on category.id=product.cid) " +
+                "left join (select productimage.pid,min(productimage.id) from product,productimage where product.id=productimage.pid and productimage.type='type_single' GROUP BY product.id)as pi on pi.pid=product.id  " +
+                "where category.id=? limit ?,?;";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -140,7 +143,7 @@ public class ProductDAO {
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                Product product = new Product();
+                /*Product product = new Product();
                 int id = rs.getInt(1);
                 String name = rs.getString("name");
                 String subTitle = rs.getString("subTitle");
@@ -158,6 +161,38 @@ public class ProductDAO {
                 product.setId(id);
                 product.setCategory(category);
                 setFirstProductImage(product);
+                productList.add(product);*/
+                Product product = new Product();
+                int id = rs.getInt("pid");
+                //int cid = rs.getInt("cid");
+                String name = rs.getString("name");
+                String subTitle = rs.getString("subTitle");
+                float orignalPrice = rs.getFloat("orignalPrice");
+                float promotePrice = rs.getFloat("promotePrice");
+                int stock = rs.getInt("stock");
+                Date createDate = DateUtil.timestampToDate(rs.getTimestamp("createDate"));
+
+                product.setName(name);
+                product.setSubTitle(subTitle);
+                product.setOrignalPrice(orignalPrice);
+                product.setPromotePrice(promotePrice);
+                product.setStock(stock);
+                product.setCreateDate(createDate);
+                product.setId(id);
+
+                Category category = new Category();
+                category.setId(cid);
+                category.setName(rs.getString("cName"));
+
+                ProductImage productImage = new ProductImage();
+                productImage.setId(rs.getInt("min(productimage.id)"));
+                productImage.setTyep(ProductImageDAO.type_single);
+                productImage.setProduct(product);
+
+                product.setCategory(category);
+                //setFirstProductImage(product);
+                product.setFirstProductImage(productImage);
+
                 productList.add(product);
             }
         } catch (SQLException e) {
@@ -172,11 +207,10 @@ public class ProductDAO {
 
     public List<Product> list(int start, int count) {
         List<Product> productList = new ArrayList<>();
-        String sql = "select category.name as cname,product.id as pid,product.*,max(productimage.id) " +
-                "from productimage,product,category " +
-                "where product.cid=category.id and productimage.pid=product.id " +
-                "GROUP BY product.id,productimage.pid,productimage.type HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?;";
-
+        String sql = "select  category.name as cname,product.id as pid,product.*,pi.* " +
+                "from (category join product on category.id=product.cid) " +
+                "join (select productimage.pid,min(productimage.id) from product,productimage where product.id=productimage.pid and productimage.type='type_single' GROUP BY product.id)as pi on pi.pid=product.id  " +
+                " limit ?,?;";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -208,12 +242,13 @@ public class ProductDAO {
                 category.setName(rs.getString("cName"));
 
                 ProductImage productImage = new ProductImage();
-                productImage.setId(rs.getInt("max(productimage.id)"));
+                productImage.setId(rs.getInt("min(productimage.id)"));
                 productImage.setTyep(ProductImageDAO.type_single);
                 productImage.setProduct(product);
 
                 product.setCategory(category);
-                setFirstProductImage(product);
+                //setFirstProductImage(product);
+                product.setFirstProductImage(productImage);
 
                 productList.add(product);
             }
@@ -240,11 +275,11 @@ public class ProductDAO {
      */
     public void fill(List<Category> categoryList, int start, int count) {
         //String sql = "select distinct Product.* from Category,Product WHERE Product.cid=? limit ?,? ";
-        /*String sql = "select p.*,max(productimage.id) from productimage" +
+        /*String sql = "select p.*,min(productimage.id) from productimage" +
                 ",(select distinct Product.* from Category,Product WHERE Product.cid=? limit ?,?)AS p" +
                 " GROUP BY p.id,productimage.type,productimage.pid " +
                 "HAVING productimage.type='type_single' and productimage.pid=p.id;";*/
-        String sql = "select product.*,max(productimage.id) from productimage,product where product.cid=? " +
+        String sql = "select product.*,min(productimage.id) from productimage,product where product.cid=? " +
                 "GROUP BY product.id,productimage.pid,productimage.type " +
                 "HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?";
 
@@ -272,7 +307,7 @@ public class ProductDAO {
                     float promotePrice = rs.getFloat("promotePrice");
                     int stock = rs.getInt("stock");
                     Date createDate = DateUtil.timestampToDate(rs.getTimestamp("createDate"));
-                    int productImageId = rs.getInt("max(productimage.id)");
+                    int productImageId = rs.getInt("min(productimage.id)");
 
                     product.setName(name);
                     product.setSubTitle(subTitle);
@@ -313,7 +348,7 @@ public class ProductDAO {
      * @param count
      */
     private void fill(Category category, int start, int count) {
-        String sql = "select product.*,max(productimage.id) from productimage,product where product.cid=? " +
+        String sql = "select product.*,min(productimage.id) from productimage,product where product.cid=? " +
                 "GROUP BY product.id,productimage.pid,productimage.type " +
                 "HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?";
 
@@ -337,7 +372,7 @@ public class ProductDAO {
                 float promotePrice = rs.getFloat("promotePrice");
                 int stock = rs.getInt("stock");
                 Date createDate = DateUtil.timestampToDate(rs.getTimestamp("createDate"));
-                int productImageId = rs.getInt("max(productimage.id)");
+                int productImageId = rs.getInt("min(productimage.id)");
 
                 product.setName(name);
                 product.setSubTitle(subTitle);
@@ -384,7 +419,7 @@ public class ProductDAO {
 
     public void setFirstProductImage(Product product) {
         List<ProductImage> productImageList = new ProductImageDAO().list(product, ProductImageDAO.type_single, 0, 1);
-        if (null != productImageList) {
+        if (null != productImageList&&0!=productImageList.size()) {
             product.setFirstProductImage(productImageList.get(0));
         }
     }
@@ -429,7 +464,7 @@ public class ProductDAO {
 
     public List<Product> search(String keyword, int start, int count) {
         List<Product> productList = new ArrayList<>();
-        String sql = "select category.name as cname,product.id as pid,product.*,max(productimage.id) " +
+        String sql = "select category.name as cname,product.id as pid,product.*,min(productimage.id) " +
                 "from productimage,product,category " +
                 "where product.cid=category.id and productimage.pid=product.id and LOCATE(?, product.name)>0 " +
                 "GROUP BY product.id,productimage.pid,productimage.type HAVING productimage.pid=product.id and productimage.type='type_single' limit ?,?;";
@@ -466,7 +501,7 @@ public class ProductDAO {
                 category.setName(rs.getString("cName"));
 
                 ProductImage productImage = new ProductImage();
-                productImage.setId(rs.getInt("max(productimage.id)"));
+                productImage.setId(rs.getInt("min(productimage.id)"));
                 productImage.setTyep(ProductImageDAO.type_single);
                 productImage.setProduct(product);
 

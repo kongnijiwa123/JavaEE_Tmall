@@ -103,7 +103,7 @@ public class ProductImageDAO {
     public List<ProductImage> list(Product product, String type, int start, int count) {
         List<ProductImage> productImageList = new ArrayList<>();
 
-        String sql = "select * from productImage where pid=? and type=? order by id desc limit ?,?";
+        String sql = "select * from productImage where pid=? and type=? order by id limit ?,?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 

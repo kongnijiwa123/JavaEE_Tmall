@@ -12,8 +12,10 @@
               username="root"
               password="1230.+"
               driverClassName="com.mysql.jdbc.Driver"
+
               url="jdbc:mysql://localhost:3306/tmall?useSSL=false&amp;characterEncoding=UTF-8"/>
 
-    <Resources cachingAllowed="true" cacheMaxSize="100000" />
+    <!--url="jdbc:mysql://47.93.243.224:3306/tmall?useSSL=false&amp;characterEncoding=UTF-8"/>-->
+    <Resources cachingAllowed="true" cacheMaxSize="100000"/>
 
 </Context>

@@ -30,9 +30,8 @@ public class DBUtil {
         Connection conn = DriverManager.getConnection(url, loginName, password);
         return conn;
     }
-
-
 */
+
     private static DataSource pool;
 
     static {
@@ -48,11 +47,9 @@ public class DBUtil {
         }
     }
 
-/*
     public static DataSource getPool() {
         return pool;
     }
-*/
 
     public static Connection getConnection() {
         Connection conn=null;
